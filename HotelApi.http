@@ -1,0 +1,94 @@
+@HotelApi_HostAddress = http://localhost:5007
+
+##################################################
+#                   REGISTER                     #
+##################################################
+
+### ------------------------------------------
+### SUCCESS: Yeni Kullanıcı Kaydı (Başarılı)
+### Beklenen Sonuç: 200 OK
+### Not: Bu isteği ilk önce gönderin.
+POST {{HotelApi_HostAddress}}/register
+Content-Type: application/json
+
+{
+  "email": "test-user@example.com",
+  "password": "Password123!",
+  "confirmPassword": "Password123!"
+}
+
+### ------------------------------------------
+### ERROR: E-posta Zaten Kayıtlı
+### Beklenen Sonuç: 409 Conflict
+### Not: Yukarıdaki başarılı kayıt isteği gönderildikten sonra çalışır.
+POST {{HotelApi_HostAddress}}/register
+Content-Type: application/json
+
+{
+  "email": "test-user@example.com",
+  "password": "Password123!",
+  "confirmPassword": "Password123!"
+}
+
+### ------------------------------------------
+### ERROR: Şifreler Uyuşmuyor
+### Beklenen Sonuç: 400 Bad Request
+POST {{HotelApi_HostAddress}}/register
+Content-Type: application/json
+
+{
+  "email": "another-user@example.com",
+  "password": "Password123!",
+  "confirmPassword": "DIFFERENT_PASSWORD"
+}
+
+### ------------------------------------------
+### ERROR: Eksik Alan (Geçersiz Model)
+### Beklenen Sonuç: 400 Bad Request
+POST {{HotelApi_HostAddress}}/register
+Content-Type: application/json
+
+{
+  "email": "test-user-3@example.com"
+}
+
+
+##################################################
+#                     LOGIN                      #
+##################################################
+
+### ------------------------------------------
+### SUCCESS: Kullanıcı Girişi (Başarılı)
+### Beklenen Sonuç: 200 OK
+### Not: Başarılı kayıt isteğinden sonra çalışır.
+POST {{HotelApi_HostAddress}}/login
+Content-Type: application/json
+
+{
+  "email": "test-user@example.com",
+  "password": "Password123!"
+}
+
+### ------------------------------------------
+### ERROR: Yanlış Şifre
+### Beklenen Sonuç: 401 Unauthorized
+POST {{HotelApi_HostAddress}}/login
+Content-Type: application/json
+
+{
+  "email": "test-user@example.com",
+  "password": "WrongPassword!"
+}
+
+### ------------------------------------------
+### ERROR: Kayıtlı Olmayan Kullanıcı
+### Beklenen Sonuç: 401 Unauthorized
+POST {{HotelApi_HostAddress}}/login
+Content-Type: application/json
+
+{
+  "email": "non-existent-user@example.com",
+  "password": "Password123!"
+}
+
+###
