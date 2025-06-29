@@ -98,7 +98,9 @@ public class GlobalExceptionMiddleware(RequestDelegate next, ILogger<GlobalExcep
         // JSON seçenekleri
         var options = new JsonSerializerOptions
         {
-            PropertyNamingPolicy = JsonNamingPolicy.CamelCase
+            PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+            ReferenceHandler = System.Text.Json.Serialization.ReferenceHandler.Preserve,
+            
         };
 
         var jsonResponse = JsonSerializer.Serialize(response, options);

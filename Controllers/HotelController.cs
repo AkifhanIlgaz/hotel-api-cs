@@ -26,4 +26,29 @@ public class HotelController(IHotelRepository hotelRepository) : Controller
         var hotel = await _hotelRepository.GetByIdAsync(id.Trim());
         return Ok(hotel);
     }
+
+    [HttpGet("search")]
+    public async Task<IActionResult> SearchHotels([FromQuery] string? city,
+                                                  [FromQuery] string? name,
+                                                  [FromQuery] double? minPrice,
+                                                  [FromQuery] double? maxPrice,
+                                                  [FromQuery] float? minRating,
+                                                  [FromQuery] float? maxRating)
+    {
+        var hotels = await _hotelRepository.SearchAsync(city, name, minPrice, maxPrice, minRating, maxRating);
+        return Ok(hotels);
+    }
+
+
+    [HttpGet("{hotelId}/reservations")]
+    public async Task<IActionResult> GetReservationsByHotelId(string hotelId)
+    {
+        var reservations = await _hotelRepository.GetReservationsByHotelIdAsync(hotelId.Trim());
+        if (reservations == null || !reservations.Any())
+        {
+            throw new KeyNotFoundException($"No reservations found for hotel with ID {hotelId}.");
+        }
+        return Ok(reservations);
+    }
+
 }
