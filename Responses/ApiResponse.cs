@@ -9,26 +9,10 @@ public enum Status
 
 public class ApiResponse<T>
 {
-    public Status Status { get; set; }
-    public string? Message { get; set; }
-    public T? Data { get; set; }
+    public bool Success { get; set; }
+    public string Message { get; set; }
+    public T Data { get; set; }
+    public List<string> Errors { get; set; } = [];
+    public DateTime Timestamp { get; set; } = DateTime.UtcNow;
 
-    public static ApiResponse<T> Success(T? data, string? message = "İşlem başarılı.")
-    {
-        return new ApiResponse<T>
-        {
-            Status = Status.Success,
-            Message = message,
-            Data = data
-        };
-    }
-
-    public static ApiResponse<T> Error(string? message = "Bir hata oluştu.")
-    {
-        return new ApiResponse<T>
-        {
-            Status = Status.Error,
-            Message = message,
-        };
-    }
 }

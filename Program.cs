@@ -1,5 +1,8 @@
 using HotelApi.Context;
+using HotelApi.Extensions;
 using HotelApi.Models;
+using HotelApi.Repositories;
+using HotelApi.Services;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
@@ -51,6 +54,7 @@ builder.Services.AddDbContext<HotelDbContext>(options =>
 builder.Services.AddAuthorization();
 builder.Services.AddIdentityApiEndpoints<User>()
     .AddEntityFrameworkStores<HotelDbContext>();
+builder.Services.AddScoped<IHotelRepository, HotelService>();
 
 builder.Services.AddControllers();
 
@@ -131,6 +135,7 @@ if (app.Environment.IsDevelopment())
         }
     }
 }
+app.UseGlobalExceptionHandler();
 
 app.UseAuthorization();
 
