@@ -14,9 +14,9 @@ public class HotelController(IHotelRepository hotelRepository) : Controller
     private readonly IHotelRepository _hotelRepository = hotelRepository;
 
     [HttpGet]
-    public async Task<IActionResult> GetAllHotels()
+    public async Task<IActionResult> GetAllHotels([FromQuery] HotelSearchRequest req)
     {
-        var hotels = await _hotelRepository.GetAllAsync();
+        var hotels = await _hotelRepository.GetAllAsync(req);
         return Ok(hotels);
     }
 
@@ -29,24 +29,6 @@ public class HotelController(IHotelRepository hotelRepository) : Controller
         return Ok(hotel);
     }
 
-    [HttpGet("search")]
-    public async Task<IActionResult> SearchHotels([FromBody] HotelSearchRequest req)
-    {
-        var hotels = await _hotelRepository.SearchAsync(req);
-        return Ok(hotels);
-    }
-
-
-    [HttpGet("{hotelId}/reservations")]
-    public async Task<IActionResult> GetReservationsByHotelId(string hotelId)
-    {
-        var reservations = await _hotelRepository.GetReservationsByHotelIdAsync(hotelId.Trim());
-        if (reservations == null || !reservations.Any())
-        {
-            throw new KeyNotFoundException($"No reservations found for hotel with ID {hotelId}.");
-        }
-        return Ok(reservations);
-    }
 
     [HttpPost]
     [Authorize(Roles = "ADMIN")]
@@ -64,11 +46,24 @@ public class HotelController(IHotelRepository hotelRepository) : Controller
             ImageUrl = req.ImageUrl.Trim(),
             PricePerNight = req.PricePerNight,
             Rating = 0,
-            Features = string.Join(", ", req.Features.Select(f => f.Trim()))
+            Features = string.Join(", ", req.Features.Select(f => f.Trim().ToLower()))
         };
 
         await _hotelRepository.AddHotelAsync(hotel);
         return CreatedAtAction(nameof(GetHotelById), new { id = hotel.Id }, hotel);
     }
+
+    [HttpGet("{hotelId}/reservations")]
+    [Authorize(Roles = "ADMIN")]
+    public async Task<IActionResult> GetReservationsOfHotel(string hotelId)
+    {
+        var reservations = await _hotelRepository.GetReservationsByHotelIdAsync(hotelId.Trim());
+        if (reservations == null || !reservations.Any())
+        {
+            throw new KeyNotFoundException($"No reservations found for hotel with ID {hotelId}.");
+        }
+        return Ok(reservations);
+    }
+
 
 }

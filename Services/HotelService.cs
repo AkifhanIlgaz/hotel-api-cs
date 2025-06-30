@@ -10,36 +10,7 @@ public class HotelService(HotelDbContext context) : IHotelRepository
 {
     private readonly HotelDbContext _context = context;
 
-    public async Task<IEnumerable<Hotel>> GetAllAsync()
-    {
-        return await _context.Hotels.ToListAsync();
-    }
-
-    public async Task<Hotel> GetByIdAsync(string id)
-    {
-        var hotel = await _context.Hotels.FindAsync(id) ?? throw new KeyNotFoundException($"Hotel with ID {id} not found.");
-        return hotel;
-    }
-
-    public async Task<IEnumerable<Reservation>> GetReservationsByHotelIdAsync(string hotelId)
-    {
-
-        if (!Guid.TryParse(hotelId, out _))
-            throw new ArgumentException("Invalid hotel ID format.", nameof(hotelId));
-
-        var reservations = await _context.Reservations
-            .Where(r => r.HotelId == hotelId)
-            .ToListAsync();
-
-        if (reservations == null || reservations.Count == 0)
-            throw new KeyNotFoundException($"No reservations found for hotel with ID {hotelId}.");
-
-        return reservations;
-    }
-
-
-
-    public async Task<IEnumerable<Hotel>> SearchAsync(HotelSearchRequest req)
+    public async Task<HotelPaginatedResponse> GetAllAsync(HotelSearchRequest req)
     {
         var query = _context.Hotels.AsQueryable();
 
@@ -69,10 +40,40 @@ public class HotelService(HotelDbContext context) : IHotelRepository
             }
         }
 
+        var skipCount = (req.Page - 1) * req.PageSize;
+        query = query.Skip(skipCount).Take(req.PageSize);
 
-        var hotels = await query.ToListAsync();
-        return hotels;
+        return new HotelPaginatedResponse
+        {
+            Hotels = await query.ToListAsync(),
+            CurrentPage = req.Page,
+            TotalCount = await _context.Hotels.CountAsync(),
+            PageSize = req.PageSize
+        };
     }
+
+    public async Task<Hotel> GetByIdAsync(string id)
+    {
+        var hotel = await _context.Hotels.FindAsync(id) ?? throw new KeyNotFoundException($"Hotel with ID {id} not found.");
+        return hotel;
+    }
+
+    public async Task<IEnumerable<Reservation>> GetReservationsByHotelIdAsync(string hotelId)
+    {
+
+        if (!Guid.TryParse(hotelId, out _))
+            throw new ArgumentException("Invalid hotel ID format.", nameof(hotelId));
+
+        var reservations = await _context.Reservations
+            .Where(r => r.HotelId == hotelId)
+            .ToListAsync();
+
+        if (reservations == null || reservations.Count == 0)
+            throw new KeyNotFoundException($"No reservations found for hotel with ID {hotelId}.");
+
+        return reservations;
+    }
+
 
     public Task AddHotelAsync(Hotel hotel)
     {
@@ -80,4 +81,6 @@ public class HotelService(HotelDbContext context) : IHotelRepository
         _context.Hotels.Add(hotel);
         return _context.SaveChangesAsync();
     }
+
+
 }

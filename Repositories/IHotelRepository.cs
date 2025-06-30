@@ -6,12 +6,8 @@ namespace HotelApi.Repositories;
 
 public interface IHotelRepository
 {
-    Task<IEnumerable<Hotel>> GetAllAsync();
-
+    Task<HotelPaginatedResponse> GetAllAsync(HotelSearchRequest req);
     Task<Hotel> GetByIdAsync(string id);
-    Task<IEnumerable<Hotel>> SearchAsync(HotelSearchRequest req);
-
     Task<IEnumerable<Reservation>> GetReservationsByHotelIdAsync(string hotelId);
-
     Task AddHotelAsync(Hotel hotel);
 }
