@@ -65,7 +65,7 @@ public class HotelService(HotelDbContext context) : IHotelRepository
             throw new ArgumentException("Invalid hotel ID format.", nameof(hotelId));
 
         var reservations = await _context.Reservations
-            .Where(r => r.HotelId == hotelId)
+            .Where(r => r.Hotel.Id == hotelId)
             .ToListAsync();
 
         if (reservations == null || reservations.Count == 0)
