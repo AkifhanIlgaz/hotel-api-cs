@@ -1,6 +1,8 @@
+using HotelApi.DTOs;
 using HotelApi.Models;
 using HotelApi.Repositories;
 using HotelApi.Responses;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace HotelApi.Controllers;
@@ -52,11 +54,25 @@ public class HotelController(IHotelRepository hotelRepository) : Controller
     }
 
     [HttpPost]
-    public async Task<IActionResult> AddHotel([FromBody] Hotel hotel)
+    [Authorize(Roles = "ADMIN")]
+    public async Task<IActionResult> AddHotel([FromBody] HotelCreationRequest req)
     {
+        Console.WriteLine(User.IsInRole("ADMIN"));
+
+        if (req == null) throw new ArgumentNullException(nameof(req), "Hotel creation request cannot be null.");
         if (!ModelState.IsValid) return BadRequest(ModelState);
-        Console.WriteLine(hotel);
-        if (hotel == null) throw new ArgumentNullException(nameof(hotel), "Hotel cannot be null.");
+
+        var hotel = new Hotel
+        {
+            Id = Guid.NewGuid().ToString(),
+            Name = req.Name.Trim(),
+            Description = req.Description.Trim(),
+            Location = req.Location.Trim(),
+            ImageUrl = req.ImageUrl.Trim(),
+            PricePerNight = req.PricePerNight,
+            Rating = 0,
+            Features = string.Join(", ", req.Features.Select(f => f.Trim()))
+        };
 
         await _hotelRepository.AddHotelAsync(hotel);
         return CreatedAtAction(nameof(GetHotelById), new { id = hotel.Id }, hotel);

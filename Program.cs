@@ -12,6 +12,8 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(options =>
 {
+    options.EnableAnnotations();
+
     options.SwaggerDoc("v1", new OpenApiInfo()
     {
         Title = "Auth Demo",
@@ -52,13 +54,17 @@ builder.Services.AddDbContext<HotelDbContext>(options =>
 );
 
 builder.Services.AddAuthorization();
-builder.Services.AddIdentityApiEndpoints<User>()
-    .AddEntityFrameworkStores<HotelDbContext>();
+builder.Services.AddIdentityApiEndpoints<User>().AddRoles<IdentityRole>()
+    .AddEntityFrameworkStores<HotelDbContext>()
+    .AddDefaultTokenProviders().AddApiEndpoints();
 builder.Services.AddScoped<IHotelRepository, HotelService>();
+
 
 builder.Services.AddControllers();
 
 var app = builder.Build();
+
+
 
 app.MapIdentityApi<User>();
 
@@ -79,13 +85,18 @@ if (app.Environment.IsDevelopment())
             context.Database.Migrate(); // Ensure the database is created and migrations are applied
 
             // Check if data already exists
-            if (!context.Users.Any())
             {
                 logger.LogInformation("Seeding database...");
-
+                var testAdmin = new User { UserName = "akif@example.com", Email = "akif@example.com", };
+                userManager.AddToRoleAsync(testAdmin, "Admin").GetAwaiter().GetResult();
                 // Create Users
-                var user1 = new User { UserName = "akif", Email = "akif@example.com", };
+                var user1 = new User { UserName = "akif2", Email = "akif@example.com", };
+
                 var result1 = userManager.CreateAsync(user1, "Password123!").GetAwaiter().GetResult();
+                var roleResult1 = userManager.AddToRoleAsync(user1, "Admin").GetAwaiter().GetResult();
+
+
+                if (!roleResult1.Succeeded) throw new Exception(string.Join("\n", "FPOIWJEPOUNSDFSD", roleResult1.Errors.Select(e => e.Description)));
                 if (!result1.Succeeded) throw new Exception(string.Join("\n", result1.Errors.Select(e => e.Description)));
 
                 var user2 = new User { UserName = "gemini", Email = "gemini@example.com", };
@@ -93,9 +104,9 @@ if (app.Environment.IsDevelopment())
                 if (!result2.Succeeded) throw new Exception(string.Join("\n", result2.Errors.Select(e => e.Description)));
 
                 // Create Hotels
-                var hotel1 = new Hotel { Name = "Grand Hyatt", Description = "A luxurious hotel in the city center.", Location = "New York", ImageUrl = "https://picsum.photos/seed/hotel1/800/600", PricePerNight = 300, Rating = 4.8f, Features = "Pool, Spa, Gym" };
-                var hotel2 = new Hotel { Name = "Seaside Resort", Description = "A beautiful resort with ocean views.", Location = "Malibu", ImageUrl = "https://picsum.photos/seed/hotel2/800/600", PricePerNight = 450, Rating = 4.9f, Features = "Beach Access, Restaurant" };
-                var hotel3 = new Hotel { Name = "Mountain Lodge", Description = "Cozy lodge with mountain views.", Location = "Aspen", ImageUrl = "https://picsum.photos/seed/hotel3/800/600", PricePerNight = 250, Rating = 4.7f, Features = "Ski-in/Ski-out, Fireplace" };
+                var hotel1 = new Hotel { Id = Guid.NewGuid().ToString(), Name = "Grand Hyatt", Description = "A luxurious hotel in the city center.", Location = "New York", ImageUrl = "https://picsum.photos/seed/hotel1/800/600", PricePerNight = 300, Rating = 4.8f, Features = "Pool, Spa, Gym" };
+                var hotel2 = new Hotel { Id = Guid.NewGuid().ToString(), Name = "Seaside Resort", Description = "A beautiful resort with ocean views.", Location = "Malibu", ImageUrl = "https://picsum.photos/seed/hotel2/800/600", PricePerNight = 450, Rating = 4.9f, Features = "Beach Access, Restaurant" };
+                var hotel3 = new Hotel { Id = Guid.NewGuid().ToString(), Name = "Mountain Lodge", Description = "Cozy lodge with mountain views.", Location = "Aspen", ImageUrl = "https://picsum.photos/seed/hotel3/800/600", PricePerNight = 250, Rating = 4.7f, Features = "Ski-in/Ski-out, Fireplace" };
 
                 context.Hotels.AddRange(hotel1, hotel2, hotel3);
                 context.SaveChanges();
