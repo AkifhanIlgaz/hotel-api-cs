@@ -44,7 +44,7 @@ public class ReservationController(IReservationRepository reservationRepository)
             CheckOutDate = req.CheckOutDate,
             GuestCount = req.GuestCount,
             TotalPrice = req.TotalPrice,
-            Status = req.Status.Trim().ToLower(),
+            Status = "pending",
             HotelId = req.HotelId.Trim(),
             UserId = req.UserId.Trim()
         };

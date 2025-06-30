@@ -17,8 +17,6 @@ public record ReservationCreationRequest
     [Required]
     public decimal TotalPrice { get; set; }
 
-    [Required]
-    public required string Status { get; set; }
 
     [Required]
     public required string HotelId { get; set; }
