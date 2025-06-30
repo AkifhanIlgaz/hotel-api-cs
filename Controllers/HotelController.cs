@@ -30,14 +30,9 @@ public class HotelController(IHotelRepository hotelRepository) : Controller
     }
 
     [HttpGet("search")]
-    public async Task<IActionResult> SearchHotels([FromQuery] string? city,
-                                                  [FromQuery] string? name,
-                                                  [FromQuery] double? minPrice,
-                                                  [FromQuery] double? maxPrice,
-                                                  [FromQuery] float? minRating,
-                                                  [FromQuery] float? maxRating)
+    public async Task<IActionResult> SearchHotels([FromBody] HotelSearchRequest req)
     {
-        var hotels = await _hotelRepository.SearchAsync(city, name, minPrice, maxPrice, minRating, maxRating);
+        var hotels = await _hotelRepository.SearchAsync(req);
         return Ok(hotels);
     }
 
@@ -57,8 +52,6 @@ public class HotelController(IHotelRepository hotelRepository) : Controller
     [Authorize(Roles = "ADMIN")]
     public async Task<IActionResult> AddHotel([FromBody] HotelCreationRequest req)
     {
-        Console.WriteLine(User.IsInRole("ADMIN"));
-
         if (req == null) throw new ArgumentNullException(nameof(req), "Hotel creation request cannot be null.");
         if (!ModelState.IsValid) return BadRequest(ModelState);
 

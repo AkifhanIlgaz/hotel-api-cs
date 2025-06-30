@@ -1,4 +1,5 @@
 using HotelApi.Context;
+using HotelApi.DTOs;
 using HotelApi.Models;
 using HotelApi.Repositories;
 using Microsoft.EntityFrameworkCore;
@@ -38,27 +39,36 @@ public class HotelService(HotelDbContext context) : IHotelRepository
 
 
 
-    public async Task<IEnumerable<Hotel>> SearchAsync(string? city, string? name, double? minPrice, double? maxPrice, float? minRating, float? maxRating)
+    public async Task<IEnumerable<Hotel>> SearchAsync(HotelSearchRequest req)
     {
         var query = _context.Hotels.AsQueryable();
 
-        if (!string.IsNullOrEmpty(city))
-            query = query.Where(h => EF.Functions.Like(h.Location, $"%{city}%"));
+        if (!string.IsNullOrEmpty(req.City))
+            query = query.Where(h => EF.Functions.Like(h.Location, $"%{req.City}%"));
 
-        if (!string.IsNullOrEmpty(name))
-            query = query.Where(h => EF.Functions.Like(h.Name, $"%{name}%"));
+        if (!string.IsNullOrEmpty(req.Name))
+            query = query.Where(h => EF.Functions.Like(h.Name, $"%{req.Name}%"));
 
-        if (minPrice.HasValue)
-            query = query.Where(h => h.PricePerNight >= minPrice.Value);
+        if (req.MinPrice.HasValue)
+            query = query.Where(h => h.PricePerNight >= req.MinPrice.Value);
 
-        if (maxPrice.HasValue)
-            query = query.Where(h => h.PricePerNight <= maxPrice.Value);
+        if (req.MaxPrice.HasValue)
+            query = query.Where(h => h.PricePerNight <= req.MaxPrice.Value);
 
-        if (minRating.HasValue)
-            query = query.Where(h => h.Rating >= minRating.Value);
+        if (req.MinRating.HasValue)
+            query = query.Where(h => h.Rating >= req.MinRating.Value);
 
-        if (maxRating.HasValue)
-            query = query.Where(h => h.Rating <= maxRating.Value);
+        if (req.MaxRating.HasValue)
+            query = query.Where(h => h.Rating <= req.MaxRating.Value);
+
+        if (req.Features is not null)
+        {
+            foreach (var feature in req.Features)
+            {
+                query = query.Where(h => EF.Functions.Like(h.Features, $"%{feature.ToLower()}%"));
+            }
+        }
+
 
         var hotels = await query.ToListAsync();
         return hotels;
