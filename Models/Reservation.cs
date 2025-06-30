@@ -1,6 +1,4 @@
-using System;
 using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
 
 namespace HotelApi.Models
 {
@@ -9,6 +7,7 @@ namespace HotelApi.Models
         public string Id { get; set; } = Guid.NewGuid().ToString();
 
         [Required]
+
         public DateTime CheckInDate { get; set; }
 
         [Required]
@@ -21,14 +20,13 @@ namespace HotelApi.Models
         public decimal TotalPrice { get; set; }
 
         [Required]
+
         public required string Status { get; set; }
 
-        public string HotelId { get; set; }
-        [ForeignKey("HotelId")]
+        public required string HotelId { get; set; }
         public Hotel Hotel { get; set; }
 
-        public string UserId { get; set; }
-        [ForeignKey("UserId")]
+        public required string UserId { get; set; }
         public User User { get; set; }
     }
 }

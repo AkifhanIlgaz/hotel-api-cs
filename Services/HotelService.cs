@@ -30,11 +30,13 @@ public class HotelService(HotelDbContext context) : IHotelRepository
             .Where(r => r.HotelId == hotelId)
             .ToListAsync();
 
-        if (reservations == null || !reservations.Any())
+        if (reservations == null || reservations.Count == 0)
             throw new KeyNotFoundException($"No reservations found for hotel with ID {hotelId}.");
 
         return reservations;
     }
+
+
 
     public async Task<IEnumerable<Hotel>> SearchAsync(string? city, string? name, double? minPrice, double? maxPrice, float? minRating, float? maxRating)
     {
@@ -60,5 +62,12 @@ public class HotelService(HotelDbContext context) : IHotelRepository
 
         var hotels = await query.ToListAsync();
         return hotels;
+    }
+
+    public Task AddHotelAsync(Hotel hotel)
+    {
+        hotel.Id = Guid.NewGuid().ToString(); // Ensure a new ID is generated
+        _context.Hotels.Add(hotel);
+        return _context.SaveChangesAsync();
     }
 }

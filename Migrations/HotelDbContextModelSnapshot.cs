@@ -313,7 +313,7 @@ namespace HotelApi.Migrations
             modelBuilder.Entity("HotelApi.Models.Reservation", b =>
                 {
                     b.HasOne("HotelApi.Models.Hotel", "Hotel")
-                        .WithMany("Reservations")
+                        .WithMany()
                         .HasForeignKey("HotelId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -378,11 +378,6 @@ namespace HotelApi.Migrations
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-                });
-
-            modelBuilder.Entity("HotelApi.Models.Hotel", b =>
-                {
-                    b.Navigation("Reservations");
                 });
 
             modelBuilder.Entity("HotelApi.Models.User", b =>

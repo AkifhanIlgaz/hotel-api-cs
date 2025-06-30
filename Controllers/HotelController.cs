@@ -51,4 +51,15 @@ public class HotelController(IHotelRepository hotelRepository) : Controller
         return Ok(reservations);
     }
 
+    [HttpPost]
+    public async Task<IActionResult> AddHotel([FromBody] Hotel hotel)
+    {
+        if (!ModelState.IsValid) return BadRequest(ModelState);
+        Console.WriteLine(hotel);
+        if (hotel == null) throw new ArgumentNullException(nameof(hotel), "Hotel cannot be null.");
+
+        await _hotelRepository.AddHotelAsync(hotel);
+        return CreatedAtAction(nameof(GetHotelById), new { id = hotel.Id }, hotel);
+    }
+
 }
