@@ -51,7 +51,7 @@ The application uses ASP.NET Core Identity, which provides the following endpoin
 *   `PUT /api/hotels/{id}`: Update an existing hotel. (**Admin only**)
 *   `DELETE /api/hotels/{id}`: Delete a hotel. (**Admin only**)
 *   `GET /api/hotels/{hotelId}/reservations`: Get all reservations for a specific hotel. (**Admin only**)
-
+k
 
 ## Example Usage
 

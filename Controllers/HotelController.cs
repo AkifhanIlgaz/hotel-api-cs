@@ -21,6 +21,7 @@ public class HotelController(IHotelRepository hotelRepository) : Controller
     }
 
     [HttpGet("{id}")]
+    [Authorize]
     public async Task<IActionResult> GetHotelById(string id)
     {
         if (!Guid.TryParse(id, out _)) throw new ArgumentException("Invalid hotel ID format.", nameof(id));

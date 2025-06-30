@@ -58,7 +58,7 @@ builder.Services.AddIdentityApiEndpoints<User>().AddRoles<IdentityRole>()
     .AddEntityFrameworkStores<HotelDbContext>()
     .AddDefaultTokenProviders().AddApiEndpoints();
 builder.Services.AddScoped<IHotelRepository, HotelService>();
-
+builder.Services.AddScoped<IReservationRepository, ReservationService>();
 
 builder.Services.AddControllers();
 
