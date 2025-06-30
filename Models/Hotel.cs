@@ -19,6 +19,4 @@ public class Hotel
     public float Rating { get; set; }
 
     public required string Features { get; set; } = string.Empty;
-
-
 }

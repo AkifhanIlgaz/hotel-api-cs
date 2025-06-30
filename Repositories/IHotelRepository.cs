@@ -10,4 +10,6 @@ public interface IHotelRepository
     Task<Hotel> GetByIdAsync(string id);
     Task<IEnumerable<Reservation>> GetReservationsByHotelIdAsync(string hotelId);
     Task AddHotelAsync(Hotel hotel);
+    Task DeleteHotelAsync(string id);
+    Task UpdateHotelAsync(Hotel hotel);
 }

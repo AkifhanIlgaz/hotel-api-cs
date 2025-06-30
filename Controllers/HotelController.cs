@@ -65,5 +65,23 @@ public class HotelController(IHotelRepository hotelRepository) : Controller
         return Ok(reservations);
     }
 
+    [HttpDelete("{id}")]
+    [Authorize(Roles = "ADMIN")]
+    public async Task<IActionResult> DeleteHotel(string id)
+    {
+        if (!Guid.TryParse(id, out _)) throw new ArgumentException("Invalid hotel ID format.", nameof(id));
+        await _hotelRepository.DeleteHotelAsync(id);
+        return NoContent();
+    }
 
+    [HttpPut("{id}")]
+    [Authorize(Roles = "ADMIN")]
+    public async Task<IActionResult> UpdateHotel(string id, [FromBody] Hotel hotel)
+    {
+        if (hotel == null) throw new ArgumentNullException(nameof(hotel), "Hotel update request cannot be null.");
+        if (!ModelState.IsValid) return BadRequest(ModelState);
+
+        await _hotelRepository.UpdateHotelAsync(hotel);
+        return NoContent();
+    }
 }

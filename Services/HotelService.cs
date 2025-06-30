@@ -82,5 +82,31 @@ public class HotelService(HotelDbContext context) : IHotelRepository
         return _context.SaveChangesAsync();
     }
 
+    public async Task DeleteHotelAsync(string id)
+    {
+        if (!Guid.TryParse(id, out _))
+            throw new ArgumentException("Invalid hotel ID format.", nameof(id));
 
+        var hotel = await _context.Hotels.FindAsync(id) ?? throw new KeyNotFoundException($"Hotel with ID {id} not found.");
+        _context.Hotels.Remove(hotel);
+        await _context.SaveChangesAsync();
+    }
+
+    public async Task UpdateHotelAsync(Hotel hotel)
+    {
+        if (!Guid.TryParse(hotel.Id, out _))
+            throw new ArgumentException("Invalid hotel ID format.", nameof(hotel.Id));
+
+        var existingHotel = (await _context.Hotels.FirstOrDefaultAsync(h => h.Id == hotel.Id) ?? throw new KeyNotFoundException($"Hotel with ID {hotel.Id} not found.")) ?? throw new KeyNotFoundException($"Hotel with ID {hotel.Id} not found.");
+        existingHotel.Name = hotel.Name;
+        existingHotel.Description = hotel.Description;
+        existingHotel.Location = hotel.Location;
+        existingHotel.ImageUrl = hotel.ImageUrl;
+        existingHotel.PricePerNight = hotel.PricePerNight;
+        existingHotel.Rating = hotel.Rating;
+        existingHotel.Features = hotel.Features;
+
+        _context.Hotels.Update(existingHotel);
+        await _context.SaveChangesAsync();
+    }
 }
